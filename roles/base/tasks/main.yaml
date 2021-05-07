@@ -1,0 +1,25 @@
+---
+- name: Add Epel repository
+  package:
+    name: epel-release
+    state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install pip
+  package:
+    name: python-pip
+    state: present
+
+- name: Create app directory
+  file:
+    path: "{{ stack_path }}"
+    state: directory
+
+- name: Copy requirements.txt
+  copy:
+    src: "files/requirements.txt"
+    dest: "{{ stack_path }}/requirements.txt"
+
+- name: Install dependencies
+  pip:
+    requirements: "{{ stack_path }}/requirements.txt"

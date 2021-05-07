@@ -1,0 +1,14 @@
+---
+# letsencrypt vars
+acme_email: ""
+
+
+# Dashboard vars
+dashboard_admin: admin
+dashboard_pwd: admin
+
+#Docker swarm vars
+stack_path: /opt/traefik 
+dashboad_name: traefik
+domain: local
+

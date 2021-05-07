@@ -1,0 +1,12 @@
+---
+- name: Copy stack file
+  template:
+    src: templates/traefik-service.yaml
+    dest: "{{ stack_path }}"
+
+- name: Create htpasswd file
+  htpasswd:
+    path: "{{ stack_path }}/usersfile"
+    name: "{{ dashboard_admin }}"
+    password: "{{ dashboard_pwd }}"
+    state: present
