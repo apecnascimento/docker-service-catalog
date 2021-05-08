@@ -12,11 +12,17 @@ Vagrant.configure("2") do |config|
   docker network create -d overlay proxy
   SCRIPT
 
-  config.vm.define "traefik" do |traefik|
-    traefik.vm.box = "centos/7"
+  config.vm.define "cicd" do |cicd|
+    cicd.vm.box = "centos/7"
 
-    traefik.vm.provision "shell", inline: $docker_install
+    cicd.vm.provision "shell", inline: $docker_install
 
-    traefik.vm.network "private_network", ip: "192.168.33.20"
+    cicd.vm.network "private_network", ip: "192.168.33.20"
+
+    cicd.vm.provider "virtualbox" do |vb|
+      vb.name = "cicd"
+      vb.memory = "2048"
+      vb.cpus = 2
+      end
   end
 end

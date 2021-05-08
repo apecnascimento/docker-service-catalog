@@ -1,0 +1,7 @@
+---
+# stack vars
+stack_path: /opt/cicd
+stack_domain: local
+
+# letsencrypt vars
+acme_email: ""

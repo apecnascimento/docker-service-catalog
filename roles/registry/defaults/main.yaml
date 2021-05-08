@@ -1,0 +1,7 @@
+---
+registry_ui_name: craneoperator
+registry_name: hub.docker
+registry_title: "My Crane Operator"
+registry_username: admin
+registry_pwd: admin
+

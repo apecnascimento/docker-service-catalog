@@ -1,14 +1,20 @@
 ---
-# letsencrypt vars
-acme_email: ""
+# Traefik ashboard vars
+traefik_dashboard_admin: admin
+traefik_dashboard_pwd: admin
+
+#Docker swarm files vars
+traefik_dashboad_name: traefik
 
 
-# Dashboard vars
-dashboard_admin: admin
-dashboard_pwd: admin
+# Pometheus metrics
+metrics: true
 
-#Docker swarm vars
-stack_path: /opt/traefik 
-dashboad_name: traefik
-domain: local
 
+# Jaeger tracing
+tracing: false
+jaeger_agent_url: ""
+
+
+# Access log
+accesslog: true

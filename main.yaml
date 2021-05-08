@@ -1,6 +1,24 @@
 ---
 - hosts: all
   become: true
-  roles:
-    - base
-    - traefik
+  vars:
+    proxy: false
+    registry: true
+  roles: 
+    - role: base
+    # - role: system
+    
+  tasks:
+    - name: Add proxy
+      include_role:
+        name: traefik
+      when: proxy
+
+    - name: Add proxy
+      include_role:
+        name: registry
+      when: registry
+       
+
+
+    

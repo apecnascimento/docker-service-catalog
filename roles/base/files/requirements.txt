@@ -1,2 +1,0 @@
-# python libs dependecies
-passlib == 1.7.4

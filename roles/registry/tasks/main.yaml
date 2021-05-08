@@ -1,0 +1,38 @@
+---
+- name: Create registry directory
+  file:
+    path: "{{ stack_path }}/registry"
+    state: directory    
+
+- name: Create registry data directory
+  file:
+    path: "{{ stack_path }}/registry/data"
+    state: directory
+    mode: 0777
+
+- name: Create registry config directory
+  file:
+    path: "{{ stack_path }}/registry/config"
+    state: directory
+    mode: 0777
+
+- name: Create admin user
+  shell: "htpasswd -Bbn {{ registry_username }} {{ registry_pwd }} > {{ stack_path }}/registry/config/htpasswd"
+
+- name: Copy registry config file
+  template: 
+    src: templates/registry_config.yaml
+    dest: "{{ stack_path }}/registry/config/config.yml"
+
+- name: Copy service file
+  template: 
+    src: templates/registry-service.yaml
+    dest: "{{ stack_path }}/registry/registry-service.yaml"
+
+- name: Remove old service
+  command: docker stack rm docker-registry
+  ignore_errors: true
+
+- name: Deploy stack
+  command: "docker stack deploy -c {{ stack_path }}/registry/registry-service.yaml docker-registry" 
+    

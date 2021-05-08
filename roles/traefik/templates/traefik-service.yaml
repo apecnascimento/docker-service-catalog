@@ -1,6 +1,6 @@
 version: '3'
 services:
-  reverse-proxy:
+  proxy:
     image: traefik:2.3
     command:
     - '--log.level=DEBUG'
@@ -11,6 +11,18 @@ services:
     - '--providers.docker.exposedbydefault=false'
     - '--providers.docker.network=traefik-public'
     - '--entrypoints.web.address=:80'
+{% if accesslog  %}
+    - '--accesslog=true'
+{% endif %}
+{% if metrics  %}
+    - '--metrics.prometheus=true'
+    - '--entryPoints.metrics.address=:8082'
+    - '--metrics.prometheus.entryPoint=metrics'
+{% endif %}
+{% if tracing and jaeger_agent_url != ""  %}
+    - '--tracing.jaeger=true'
+    - '--tracing.jaeger.samplingServerURL={{ jaeger_agent_url }}'
+{% endif %}
 {% if acme_email != "" %}
     - '--entrypoints.websecure.address=:443'
     - '--certificatesresolvers.letsencryptresolver.acme.httpchallenge=true'
@@ -19,9 +31,10 @@ services:
     - '--certificatesresolvers.letsencryptresolver.acme.storage=/letsencrypt/acme.json'
 {% endif %}
     ports:
-    - 80:80
+      - 80:80
+      - 8082:8082
 {% if acme_email != "" %}
-    - 443:443
+      - 443:443
 {% endif %}
     volumes:
 {% if acme_email != "" %}
@@ -29,7 +42,7 @@ services:
 {% endif %}
 
     - /var/run/docker.sock:/var/run/docker.sock:ro
-    - {{ stack_path }}/usersfile:/usersfile
+    - {{ stack_path }}/traefik/usersfile:/usersfile
     networks:
     - traefik-public
     deploy:
@@ -38,6 +51,7 @@ services:
         - node.role == manager
       labels:
       - 'traefik.enable=true'
+
 {% if acme_email != "" %}
       # HTTP Catchall for redirecting HTTP -> HTTPS
       - 'traefik.http.routers.http-catchall.rule=PathPrefix(`/`)'
@@ -50,9 +64,9 @@ services:
       - 'traefik.http.routers.traefik.entrypoints=web'
 {% endif %}
       # Traefik dashboard
-      - 'traefik.http.routers.traefik.rule=(Host(`{{ dashboad_name }}{{ domain }}`) || Host(`www.{{ dashboad_name }}{{ domain }}`))' # Put in your domain
+      - 'traefik.http.routers.traefik.rule=(Host(`{{ traefik_dashboad_name }}.{{ stack_domain }}`) || Host(`www.{{ traefik_dashboad_name }}.{{ stack_domain }}`))' # Put in your stack_domain
       - 'traefik.http.routers.traefik.service=api@internal'
-      - 'traefik.http.services.api@internal.loadbalancer.server.port=8080' 
+      - 'traefik.http.services.api@internal.loadbalancer.server.port=8081' 
       - 'traefik.http.routers.traefik.middlewares=traefik-auth'
       - 'traefik.http.middlewares.traefik-auth.basicauth.usersfile=/usersfile'
 
@@ -65,3 +79,4 @@ volumes:
 
 networks:
   traefik-public:
+    external: true

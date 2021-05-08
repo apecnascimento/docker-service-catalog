@@ -1,12 +1,32 @@
 ---
-- name: Copy stack file
-  template:
-    src: templates/traefik-service.yaml
-    dest: "{{ stack_path }}"
-
+- name: Create traefik directory
+  file:
+    path: "{{ stack_path }}/traefik"
+    state: directory
+    
 - name: Create htpasswd file
   htpasswd:
-    path: "{{ stack_path }}/usersfile"
-    name: "{{ dashboard_admin }}"
-    password: "{{ dashboard_pwd }}"
+    path: "{{ stack_path }}/traefik/usersfile"
+    name: "{{ traefik_dashboard_admin }}"
+    password: "{{ traefik_dashboard_pwd }}"
     state: present
+
+- name: Create traefik-public network
+  command: docker network create -d overlay traefik-public 
+  ignore_errors: true
+  
+- name: Copy service file
+  template: 
+    src: templates/traefik-service.yaml
+    dest: "{{ stack_path }}/traefik/traefik-service.yaml"
+
+- name: Remove old service
+  command: docker service rm traefik_proxy
+  ignore_errors: true
+
+- name: Deploy stack
+  command: "docker stack deploy -c {{ stack_path }}/traefik/traefik-service.yaml traefik" 
+    
+
+
+
