@@ -38,7 +38,7 @@ services:
 {% endif %}
     volumes:
 {% if acme_email != "" %}
-    - acme-certs:/letsencrypt
+    - {{ stack_path }}/traefik/letsencrypt:/letsencrypt
 {% endif %}
 
     - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -50,25 +50,25 @@ services:
         constraints:
         - node.role == manager
       labels:
-      - 'traefik.enable=true'
+        - 'traefik.enable=true'
 
 {% if acme_email != "" %}
       # HTTP Catchall for redirecting HTTP -> HTTPS
-      - 'traefik.http.routers.http-catchall.rule=PathPrefix(`/`)'
-      - 'traefik.http.routers.http-catchall.entrypoints=web'
-      - 'traefik.http.routers.http-catchall.middlewares=redirect-to-https'
-      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
-      - 'traefik.http.routers.traefik.entrypoints=websecure'
-      - 'traefik.http.routers.traefik.tls.certresolver=letsencryptresolver'
+        - 'traefik.http.routers.http-catchall.rule=PathPrefix(`/`)'
+        - 'traefik.http.routers.http-catchall.entrypoints=web'
+        - 'traefik.http.routers.http-catchall.middlewares=redirect-to-https'
+        - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
+        - 'traefik.http.routers.traefik.entrypoints=websecure'
+        - 'traefik.http.routers.traefik.tls.certresolver=letsencryptresolver'
 {% else %}
       - 'traefik.http.routers.traefik.entrypoints=web'
 {% endif %}
       # Traefik dashboard
-      - 'traefik.http.routers.traefik.rule=(Host(`{{ traefik_dashboad_name }}.{{ stack_domain }}`) || Host(`www.{{ traefik_dashboad_name }}.{{ stack_domain }}`))' # Put in your stack_domain
-      - 'traefik.http.routers.traefik.service=api@internal'
-      - 'traefik.http.services.api@internal.loadbalancer.server.port=8081' 
-      - 'traefik.http.routers.traefik.middlewares=traefik-auth'
-      - 'traefik.http.middlewares.traefik-auth.basicauth.usersfile=/usersfile'
+        - 'traefik.http.routers.traefik.rule=(Host(`{{ traefik_dashboad_name }}.{{ stack_domain }}`))' # Put in your stack_domain
+        - 'traefik.http.routers.traefik.service=api@internal'
+        - 'traefik.http.services.api@internal.loadbalancer.server.port=8081' 
+        - 'traefik.http.routers.traefik.middlewares=traefik-auth'
+        - 'traefik.http.middlewares.traefik-auth.basicauth.usersfile=/usersfile'
 
 
 
