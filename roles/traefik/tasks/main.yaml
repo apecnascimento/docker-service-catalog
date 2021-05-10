@@ -3,7 +3,12 @@
   file:
     path: "{{ stack_path }}/traefik"
     state: directory
-    
+
+- name: Create traefik letsencrypt directory
+  file:
+    path: "{{ stack_path }}/traefik/letsencrypt"
+    state: directory
+
 - name: Create htpasswd file
   htpasswd:
     path: "{{ stack_path }}/traefik/usersfile"
@@ -21,7 +26,7 @@
     dest: "{{ stack_path }}/traefik/traefik-service.yaml"
 
 - name: Remove old service
-  command: docker service rm traefik_proxy
+  command: docker stack rm traefik
   ignore_errors: true
 
 - name: Deploy stack

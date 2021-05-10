@@ -17,10 +17,17 @@
     state: present
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Install pip
+- name: Install python-pip
   package:
     name: python-pip
     state: present
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Install python3-pip
+  package:
+    name: python3-pip
+    state: present
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
 - name: Copy requirements.txt
   copy:

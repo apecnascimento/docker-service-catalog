@@ -1,0 +1,59 @@
+version: '3'
+
+networks:
+  traefik-public:
+    external: true
+
+services:
+  panel:
+    image: drone/drone:1.10.1
+    enviroment:
+{% if drone_bitbucket_client_id != "" and drone_bitbucket_client_secret != "" %}
+      - "DRONE_BITBUCKET_CLIENT_ID={{ drone_bitbucket_client_id }}"
+      - "DRONE_BITBUCKET_CLIENT_SECRET={{ drone_bitbucket_client_secret }}"
+{% endif %}
+{% if drone_github_client_id != "" and drone_github_client_secret != "" %}
+      - "DRONE_GITHUB_CLIENT_ID={{ drone_github_client_id }}"
+      - "DRONE_GITHUB_CLIENT_SECRET={{ drone_github_client_secret }}"
+{% endif %}
+{% if gitlab %}
+      - "DRONE_GITLAB_SERVER={{ drone_gitlab_server }}"
+      - "DRONE_GITLAB_CLIENT_ID={{ drone_gitlab_client_id }}"
+      - "DRONE_GITLAB_CLIENT_SECRET={{ drone_gitlab_client_secret }}"
+{% endif %}
+{% if drone_gitea_server != "" and drone_gitea_client_id != "" and drone_gitea_client_secret != ""  %}
+      - "DRONE_GITEA_SERVER={{ drone_gitea_server }}"
+      - "DRONE_GITEA_CLIENT_ID={{ drone_gitea_client_id }}"
+      - "DRONE_GITEA_CLIENT_SECRET={{ drone_gitea_client_secret }}"
+{% endif %}
+      - "DRONE_RPC_SECRET={{ drone_rpc_secret }}"
+      - "DRONE_SERVER_HOST={{ drone_server_host }}"
+      - "DRONE_SERVER_PROTO={{ drone_server_proto }}"
+    deploy: 
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.drone.rule=Host(`{{ drone_name }}.{{ stack_domain }}`)
+        - 'traefik.http.routers.drone.service=drone-service'
+        - 'traefik.http.services.drone-service.loadbalancer.server.port=80' 
+{% if acme_email != "" %}      
+        - traefik.http.routers.drone.entrypoints=websecure
+        - traefik.http.routers.drone.tls=true
+        - traefik.http.routers.drone.tls.certresolver=letsencryptresolver
+{% else %}
+        - 'traefik.http.routers.drone.entrypoints=web'
+{% endif %}
+
+  runner:
+    image: drone/drone-runner-docker:1.6.3
+    enviroment:
+      - "DRONE_RPC_PROTO=http"
+      - "DRONE_DEBUG=true"
+      - "DRONE_TRACE=true"
+      - "DRONE_RPC_HOST=droneci_panel"
+      - "DRONE_RPC_SECRET={{ drone_rpc_secret }}"
+      - "DRONE_RUNNER_CAPACITY={{ drone_runner_capacity }}"
+    volume:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+

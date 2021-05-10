@@ -1,0 +1,5 @@
+---
+- name: Create drone directory
+  file:
+    path: "{{ stack_path }}/drone"
+    state: directory    
