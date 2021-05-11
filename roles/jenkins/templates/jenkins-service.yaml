@@ -1,0 +1,35 @@
+version: '3'
+
+networks:
+  traefik-public:
+    external: true
+
+services:
+  server:
+    image: jenkins/jenkins:lts-alpine
+    privileged: true
+    user: root
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "{{ stack_path }}/jenkins/data:/var/jenkins_home"
+    networks:
+      - traefik-public
+    deploy: 
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.jenkins.rule=Host(`{{ jenkins_name }}.{{ stack_domain }}`)
+        - 'traefik.http.routers.jenkins.service=jenkins-service'
+        - 'traefik.http.services.jenkins-service.loadbalancer.server.port=8080' 
+{% if acme_email != "" %}      
+        - traefik.http.routers.jenkins.entrypoints=websecure
+        - traefik.http.routers.jenkins.tls=true
+        - traefik.http.routers.jenkins.tls.certresolver=letsencryptresolver
+{% else %}
+        - 'traefik.http.routers.jenkins.entrypoints=web'
+{% endif %}
+
+
+
+
+

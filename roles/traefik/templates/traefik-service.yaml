@@ -3,21 +3,21 @@ services:
   proxy:
     image: traefik:2.3
     command:
-    - '--log.level=DEBUG'
-    - '--api=true'
-    - '--api.dashboard=true'
-    - '--providers.docker.endpoint=unix:///var/run/docker.sock'
-    - '--providers.docker.swarmMode=true'
-    - '--providers.docker.exposedbydefault=false'
-    - '--providers.docker.network=traefik-public'
-    - '--entrypoints.web.address=:80'
+      - '--log.level=DEBUG'
+      - '--api=true'
+      - '--api.dashboard=true'
+      - '--providers.docker.endpoint=unix:///var/run/docker.sock'
+      - '--providers.docker.swarmMode=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--providers.docker.network=traefik-public'
+      - '--entrypoints.web.address=:80'
 {% if accesslog  %}
-    - '--accesslog=true'
+      - '--accesslog=true'
 {% endif %}
 {% if metrics  %}
-    - '--metrics.prometheus=true'
-    - '--entryPoints.metrics.address=:8082'
-    - '--metrics.prometheus.entryPoint=metrics'
+      - '--metrics.prometheus=true'
+      - '--entryPoints.metrics.address=:8082'
+      - '--metrics.prometheus.entryPoint=metrics'
 {% endif %}
 {% if tracing and jaeger_agent_url != ""  %}
     - '--tracing.jaeger=true'
@@ -38,13 +38,13 @@ services:
 {% endif %}
     volumes:
 {% if acme_email != "" %}
-    - {{ stack_path }}/traefik/letsencrypt:/letsencrypt
+      - {{ stack_path }}/traefik/letsencrypt:/letsencrypt
 {% endif %}
 
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - {{ stack_path }}/traefik/usersfile:/usersfile
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ stack_path }}/traefik/usersfile:/usersfile
     networks:
-    - traefik-public
+      - traefik-public
     deploy:
       placement:
         constraints:
@@ -61,7 +61,7 @@ services:
         - 'traefik.http.routers.traefik.entrypoints=websecure'
         - 'traefik.http.routers.traefik.tls.certresolver=letsencryptresolver'
 {% else %}
-      - 'traefik.http.routers.traefik.entrypoints=web'
+        - 'traefik.http.routers.traefik.entrypoints=web'
 {% endif %}
       # Traefik dashboard
         - 'traefik.http.routers.traefik.rule=(Host(`{{ traefik_dashboad_name }}.{{ stack_domain }}`))' # Put in your stack_domain
@@ -71,11 +71,6 @@ services:
         - 'traefik.http.middlewares.traefik-auth.basicauth.usersfile=/usersfile'
 
 
-
-{% if acme_email != "" %}
-volumes:
-  acme-certs:
-{% endif %}
 
 networks:
   traefik-public:

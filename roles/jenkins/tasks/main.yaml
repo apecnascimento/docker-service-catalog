@@ -1,0 +1,22 @@
+---
+- name: Create jenkins directory
+  file:
+    path: "{{ stack_path }}/jenkins"
+    state: directory
+
+- name: Create data directory
+  file:
+    path: "{{ stack_path }}/jenkins/data"
+    state: directory
+
+- name: Copy service file
+  template: 
+    src: templates/jenkins-service.yaml
+    dest: "{{ stack_path }}/jenkins/jenkins-service.yaml"
+
+- name: Remove old stack
+  command: docker stack rm jenkins
+  ignore_errors: true
+
+- name: Deploy stack
+  command: "docker stack deploy -c {{ stack_path }}/jenkins/jenkins-service.yaml jenkins" 

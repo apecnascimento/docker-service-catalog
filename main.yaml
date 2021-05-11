@@ -5,25 +5,31 @@
     proxy: true
     registry: false
     drone: false
+    jenkins: true
   roles: 
     - role: base
     - role: system
     
   tasks:
-    - name: Add proxy
+    - name: Add Traefik Proxy
       include_role:
         name: traefik
       when: proxy
 
-    - name: Add registry
+    - name: Add Docker Registry
       include_role:
         name: registry
       when: registry
 
-    - name: Add drone
+    - name: Add DroneCI
       include_role:
         name: drone
       when: drone
+
+    - name: Add Jenkins
+      include_role:
+        name: jenkins
+      when: jenkins
        
 
 
