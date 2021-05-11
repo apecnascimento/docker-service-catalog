@@ -8,7 +8,7 @@
     jenkins: true
   roles: 
     - role: base
-    # - role: system
+    - role: system
     
   tasks:
     - name: Add Traefik Proxy

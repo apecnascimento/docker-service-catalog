@@ -9,7 +9,7 @@ services:
     image: jenkins/jenkins:lts
     privileged: true
     user: root
-    volume:
+    volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "{{ stack_path }}/jenkins/data:/var/jenkins_home"
     deploy: 

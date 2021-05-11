@@ -7,9 +7,9 @@ Vagrant.configure("2") do |config|
   sudo yum install -y docker-ce docker-ce-cli containerd.io
   sudo yum install -y git
   usermod -aG docker vagrant
+  sudo systemctl enable docker
   sudo systemctl start docker
-  sudo docker swarm init --advertise-addr 192.168.33.20
-  docker network create -d overlay proxy
+  sudo docker swarm init --advertise-addr 192.168.33.20  
   SCRIPT
 
   config.vm.define "cicd" do |cicd|
