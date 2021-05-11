@@ -6,12 +6,14 @@ networks:
 
 services:
   server:
-    image: jenkins/jenkins:lts
+    image: jenkins/jenkins:lts-alpine
     privileged: true
     user: root
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "{{ stack_path }}/jenkins/data:/var/jenkins_home"
+    networks:
+      - traefik-public
     deploy: 
       replicas: 1
       labels:
