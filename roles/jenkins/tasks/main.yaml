@@ -9,19 +9,6 @@
     path: "{{ stack_path }}/jenkins/data"
     state: directory
 
-
-- name: Create data directory
-  file:
-    path: "{{ stack_path }}/jenkins/data/userContent/layout"
-    state: directory
-
-
-
-- name: Copy image logo
-  copy:
-    src: files/logo.png
-    dest: "{{ stack_path }}/jenkins/data/userContent/layout/logo.png"
-
 - name: Create certs directory
   file:
     path: "{{ stack_path }}/jenkins/certs/client"
