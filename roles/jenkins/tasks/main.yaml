@@ -9,11 +9,39 @@
     path: "{{ stack_path }}/jenkins/data"
     state: directory
 
+
+- name: Create data directory
+  file:
+    path: "{{ stack_path }}/jenkins/data/userContent/layout"
+    state: directory
+
+
+
+- name: Copy image logo
+  copy:
+    src: files/logo.png
+    dest: "{{ stack_path }}/jenkins/data/userContent/layout/logo.png"
+
+- name: Create certs directory
+  file:
+    path: "{{ stack_path }}/jenkins/certs/client"
+    state: directory
+    mode: 0777
+    recurse: true
+
 - name: Copy service file
   template: 
     src: templates/jenkins-service.yaml
     dest: "{{ stack_path }}/jenkins/jenkins-service.yaml"
 
+- name: Copy custon jenkins Dockerfile
+  copy:
+    src: files/Dockerfile
+    dest: "{{ stack_path }}/jenkins/Dockerfile"
+
+- name: Build custom Jenkins Docker image
+  shell: "docker build -t jenkins-blueocean . -f {{ stack_path }}/jenkins/Dockerfile"
+  
 - name: Remove old stack
   command: docker stack rm jenkins
   ignore_errors: true
